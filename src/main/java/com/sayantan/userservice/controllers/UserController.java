@@ -1,6 +1,7 @@
 package com.sayantan.userservice.controllers;
 
 import com.sayantan.userservice.dtos.*;
+import com.sayantan.userservice.exceptions.DupliateEmailException;
 import com.sayantan.userservice.exceptions.IncorrectPasswordException;
 import com.sayantan.userservice.exceptions.UserNotFoundException;
 import com.sayantan.userservice.models.Token;
@@ -22,9 +23,14 @@ public class UserController {
         this.userService = userService;
     }
     @PostMapping("/signup")
-    public UserDTO signup(@RequestBody SignupRequestDTO req) {
-        User user = userService.signup(req.getName(), req.getEmail(), req.getPassword());
-        return UserDTO.form(user);
+    public ResponseEntity<?> signup(@RequestBody SignupRequestDTO req) {
+        try {
+            User user = userService.signup(req.getName(), req.getEmail(), req.getPassword());
+            return new ResponseEntity<>(UserDTO.form(user), HttpStatus.OK);
+        } catch(DupliateEmailException err) {
+            ErrorResponseDTO errorResponseDTO = new ErrorResponseDTO(err.getMessage(), "");
+            return new ResponseEntity<>(errorResponseDTO, HttpStatus.BAD_REQUEST);
+        }
     }
 
     @PostMapping("/login")
