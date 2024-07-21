@@ -3,11 +3,11 @@ package com.sayantan.userservice.controllers;
 import com.sayantan.userservice.dtos.*;
 import com.sayantan.userservice.exceptions.DupliateEmailException;
 import com.sayantan.userservice.exceptions.IncorrectPasswordException;
+import com.sayantan.userservice.exceptions.InvalidTokenException;
 import com.sayantan.userservice.exceptions.UserNotFoundException;
 import com.sayantan.userservice.models.Token;
 import com.sayantan.userservice.models.User;
 import com.sayantan.userservice.services.UserService;
-import org.springframework.http.HttpRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -49,13 +49,33 @@ public class UserController {
     }
 
     @PostMapping("/logout")
-    public void logout(@RequestBody LogoutRequestDTO req) {
-//        return null;
+    public ResponseEntity<?> logout(@RequestBody LogoutRequestDTO req) {
+        try {
+            userService.logout(req.getToken());
+            return new ResponseEntity<>("Logout successfully.", HttpStatus.OK);
+        } catch(InvalidTokenException er) {
+            ErrorResponseDTO errorResponse = new ErrorResponseDTO(er.getMessage(), "");
+            return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+        }catch (RuntimeException err) {
+            System.out.println(err.getMessage());
+            ErrorResponseDTO errorResponse = new ErrorResponseDTO(err.getMessage(), getStackTraceAsString(err));
+            return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @GetMapping("/validate/{token}")
-    public UserDTO validateToken(@PathVariable String token) {
-        return null;
+    public ResponseEntity<?> validateToken(@PathVariable String token) {
+        try {
+            User user = userService.validate(token);
+            return new ResponseEntity<>(UserDTO.form(user), HttpStatus.OK);
+        } catch(InvalidTokenException err) {
+            ErrorResponseDTO errorResponse = new ErrorResponseDTO(err.getMessage(), "");
+            return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+        } catch (RuntimeException err) {
+            System.out.println(err.getMessage());
+            ErrorResponseDTO errorResponse = new ErrorResponseDTO(err.getMessage(), getStackTraceAsString(err));
+            return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     private String getStackTraceAsString(Throwable throwable) {

@@ -2,25 +2,29 @@ package com.sayantan.userservice.services;
 
 import com.sayantan.userservice.exceptions.DupliateEmailException;
 import com.sayantan.userservice.exceptions.IncorrectPasswordException;
+import com.sayantan.userservice.exceptions.InvalidTokenException;
 import com.sayantan.userservice.exceptions.UserNotFoundException;
 import com.sayantan.userservice.models.Token;
 import com.sayantan.userservice.models.User;
+import com.sayantan.userservice.repositories.TokenRepository;
 import com.sayantan.userservice.repositories.UserRepository;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Calendar;
 import java.util.Date;
-import java.util.Objects;
 import java.util.Optional;
 
 @Service
 public class UserService {
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
     private final UserRepository userRepository;
-    UserService(BCryptPasswordEncoder bCryptPasswordEncoder, UserRepository userRepository) {
+    private final TokenRepository tokenRepository;
+    UserService(BCryptPasswordEncoder bCryptPasswordEncoder, UserRepository userRepository, TokenRepository tokenRepository) {
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
         this.userRepository = userRepository;
+        this.tokenRepository = tokenRepository;
     }
     public User signup(String name, String email, String password) {
         if(userFoundByEmail(email))
@@ -38,15 +42,24 @@ public class UserService {
         User user = optionalUser.get();
         if(!bCryptPasswordEncoder.matches(password, user.getPasswordHash()))
             throw new IncorrectPasswordException("Password doesn't match for email " + email);
-        return genarateToken(user);
+        return tokenRepository.save(genarateToken(user));
     }
 
-    User validate(String token) {
-        return null;
+    public User validate(String tokenString) {
+        Optional<Token> optionalToken = tokenRepository.findByValueAndIsDeletedAndExpiresAtIsGreaterThanEqual(tokenString, false, new Date());
+        if(optionalToken.isEmpty())
+            throw new InvalidTokenException("Provided token is not valid!");
+        Token token = optionalToken.get();
+        return token.getUser();
     }
 
-    void logout(String token) {
-        return;
+    public void logout(String tokenString) {
+        Optional<Token> optionalToken = tokenRepository.findByValueAndIsDeletedAndExpiresAtIsGreaterThanEqual(tokenString, false, new Date());
+        if(optionalToken.isEmpty())
+            throw new InvalidTokenException("Provided token is not valid!");
+        Token token = optionalToken.get();
+        token.setDeleted(true);
+        tokenRepository.save(token);
     }
 
     private boolean userFoundByEmail(String email) {
@@ -58,7 +71,7 @@ public class UserService {
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(new Date());
         calendar.add(Calendar.DAY_OF_YEAR, 90);
-        Date epiresAt = calendar.getTime();
-        return new Token("abcd_1234", user, epiresAt);
+        Date expiresAt = calendar.getTime();
+        return new Token(RandomStringUtils.randomAlphabetic(128), user, expiresAt);
     }
 }
