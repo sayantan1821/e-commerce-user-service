@@ -1,4 +1,4 @@
-package com.sayantan.userservice.security.repository;
+package com.sayantan.userservice.security.services;
 
 import com.sayantan.userservice.security.models.AuthorizationConsent;
 import org.springframework.data.jpa.repository.JpaRepository;
