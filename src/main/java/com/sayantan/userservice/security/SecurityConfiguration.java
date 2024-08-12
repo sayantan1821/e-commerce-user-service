@@ -80,35 +80,35 @@ public class SecurityConfiguration {
         return http.build();
     }
 
-    @Bean
-    public UserDetailsService userDetailsService() {
-        UserDetails userDetails = User.builder()
-                .username("user")
-                .password("$2a$12$mZNAfNqqTjl/kX6VhFSEKuO4s4VvewG6zAd.h/Z9sjVZKzaha0OYK")
-                .roles("USER")
-                .build();
+//    @Bean
+//    public UserDetailsService userDetailsService() {
+//        UserDetails userDetails = User.builder()
+//                .username("user")
+//                .password("$2a$12$mZNAfNqqTjl/kX6VhFSEKuO4s4VvewG6zAd.h/Z9sjVZKzaha0OYK")
+//                .roles("USER")
+//                .build();
+//
+//        return new InMemoryUserDetailsManager(userDetails);
+//    }
 
-        return new InMemoryUserDetailsManager(userDetails);
-    }
-
-    @Bean
-    public RegisteredClientRepository registeredClientRepository() {
-        RegisteredClient oidcClient = RegisteredClient.withId(UUID.randomUUID().toString())
-                .clientId("oidc-client")
-                .clientSecret("$2a$12$RWxI5gmURkd0W8nrF6Eloe1Z5TzdvY611jzQpSStg5.cXRZIJDGfq")
-                .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
-                .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
-                .authorizationGrantType(AuthorizationGrantType.REFRESH_TOKEN)
-                .redirectUri("https://oauth.pstmn.io/v1/callback")
-                .postLogoutRedirectUri("https://oauth.pstmn.io/v1/callback")
-                .scope(OidcScopes.OPENID)
-                .scope(OidcScopes.PROFILE)
-                .scope("ADMIN")
-                .clientSettings(ClientSettings.builder().requireAuthorizationConsent(true).build())
-                .build();
-
-        return new InMemoryRegisteredClientRepository(oidcClient);
-    }
+//    @Bean
+//    public RegisteredClientRepository registeredClientRepository() {
+//        RegisteredClient oidcClient = RegisteredClient.withId(UUID.randomUUID().toString())
+//                .clientId("oidc-client")
+//                .clientSecret("$2a$12$RWxI5gmURkd0W8nrF6Eloe1Z5TzdvY611jzQpSStg5.cXRZIJDGfq")
+//                .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
+//                .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
+//                .authorizationGrantType(AuthorizationGrantType.REFRESH_TOKEN)
+//                .redirectUri("https://oauth.pstmn.io/v1/callback")
+//                .postLogoutRedirectUri("https://oauth.pstmn.io/v1/callback")
+//                .scope(OidcScopes.OPENID)
+//                .scope(OidcScopes.PROFILE)
+//                .scope("ADMIN")
+//                .clientSettings(ClientSettings.builder().requireAuthorizationConsent(true).build())
+//                .build();
+//
+//        return new InMemoryRegisteredClientRepository(oidcClient);
+//    }
 
     @Bean
     public JWKSource<SecurityContext> jwkSource() {
