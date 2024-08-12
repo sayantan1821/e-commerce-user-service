@@ -1,8 +1,10 @@
 package com.sayantan.userservice.security.models;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.sayantan.userservice.models.Role;
 import org.springframework.security.core.GrantedAuthority;
 
+@JsonDeserialize
 public class CustomGrantedAuthority implements GrantedAuthority {
 
     private final String authority;

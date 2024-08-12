@@ -1,7 +1,9 @@
 package com.sayantan.userservice.security.models;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.sayantan.userservice.models.Role;
 import com.sayantan.userservice.models.User;
+import lombok.NoArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -9,23 +11,26 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+@NoArgsConstructor(force = true)
+@JsonDeserialize
 public class CustomUserDetails implements UserDetails {
 
     private final String username;
     private final String password;
-    private final boolean isAccountNonExpired;
-    private final boolean isAccountNonLocked;
-    private final boolean isCredentialsNonExpired;
-    private final boolean isEnabled;
+    private final boolean accountNonExpired;
+    private final boolean accountNonLocked;
+    private final boolean credentialsNonExpired;
+    private final boolean enabled;
     private final List<CustomGrantedAuthority> authorities;
+
 
     public CustomUserDetails(User user) {
         this.username = user.getEmail();
         this.password = user.getPasswordHash();
-        this.isAccountNonExpired = true;
-        this.isEnabled = true;
-        this.isAccountNonLocked = true;
-        this.isCredentialsNonExpired = true;
+        this.accountNonExpired = true;
+        this.enabled = true;
+        this.accountNonLocked = true;
+        this.credentialsNonExpired = true;
         authorities = new ArrayList<>();
         for(Role role: user.getRoles()) {
             authorities.add(new CustomGrantedAuthority(role));
@@ -48,21 +53,21 @@ public class CustomUserDetails implements UserDetails {
 
     @Override
     public boolean isAccountNonExpired() {
-        return isAccountNonExpired;
+        return accountNonExpired;
     }
 
     @Override
     public boolean isAccountNonLocked() {
-        return isAccountNonLocked;
+        return accountNonLocked;
     }
 
     @Override
     public boolean isCredentialsNonExpired() {
-        return isCredentialsNonExpired;
+        return credentialsNonExpired;
     }
 
     @Override
     public boolean isEnabled() {
-        return isEnabled;
+        return enabled;
     }
 }
