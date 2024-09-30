@@ -78,6 +78,11 @@ public class UserController {
         }
     }
 
+    @GetMapping("/test")
+    public ResponseEntity<?> test() {
+        return new ResponseEntity<>("Test OK :)", HttpStatus.OK);
+    }
+
     private String getStackTraceAsString(Throwable throwable) {
         StringWriter sw = new StringWriter();
         PrintWriter pw = new PrintWriter(sw);

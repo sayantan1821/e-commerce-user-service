@@ -72,20 +72,20 @@ public class SecurityConfiguration {
         return http.build();
     }
 
-    @Bean
-    @Order(2)
-    public SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http)
-            throws Exception {
-        http
-                .authorizeHttpRequests((authorize) -> authorize
-                        .anyRequest().authenticated()
-                )
-                // Form login handles the redirect to the login page from the
-                // authorization server filter chain
-                .formLogin(Customizer.withDefaults());
-
-        return http.build();
-    }
+//    @Bean
+//    @Order(2)
+//    public SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http)
+//            throws Exception {
+//        http
+//                .authorizeHttpRequests((authorize) -> authorize
+//                        .anyRequest().authenticated()
+//                )
+//                // Form login handles the redirect to the login page from the
+//                // authorization server filter chain
+//                .formLogin(Customizer.withDefaults());
+//
+//        return http.build();
+//    }
 
 //    @Bean
 //    public UserDetailsService userDetailsService() {
@@ -153,19 +153,19 @@ public class SecurityConfiguration {
         return AuthorizationServerSettings.builder().build();
     }
 
-    @Bean
-    public OAuth2TokenCustomizer<JwtEncodingContext> jwtTokenCustomizer() {
-        return (context) -> {
-            if (OAuth2TokenType.ACCESS_TOKEN.equals(context.getTokenType())) {
-                context.getClaims().claims((claims) -> {
-                    Set<String> roles = AuthorityUtils.authorityListToSet(context.getPrincipal().getAuthorities())
-                            .stream()
-                            .map(c -> c.replaceFirst("^ROLE_", ""))
-                            .collect(Collectors.collectingAndThen(Collectors.toSet(), Collections::unmodifiableSet));
-                    claims.put("roles", roles);
-                });
-            }
-        };
-    }
+//    @Bean
+//    public OAuth2TokenCustomizer<JwtEncodingContext> jwtTokenCustomizer() {
+//        return (context) -> {
+//            if (OAuth2TokenType.ACCESS_TOKEN.equals(context.getTokenType())) {
+//                context.getClaims().claims((claims) -> {
+//                    Set<String> roles = AuthorityUtils.authorityListToSet(context.getPrincipal().getAuthorities())
+//                            .stream()
+//                            .map(c -> c.replaceFirst("^ROLE_", ""))
+//                            .collect(Collectors.collectingAndThen(Collectors.toSet(), Collections::unmodifiableSet));
+//                    claims.put("roles", roles);
+//                });
+//            }
+//        };
+//    }
 
 }
